@@ -18,7 +18,7 @@
       export CALAGOPUS_TOKEN="$(< "$CREDENTIALS_DIRECTORY/token")"
     ''}
 
-    exec ${lib.getExe cfg.package} --config ${configFile} --no-setup
+    exec ${lib.getExe cfg.package} --config ${cfg.runDir}/config.yml --no-setup
   '';
 in {
   options.services.calagopus.wings = {
@@ -185,6 +185,7 @@ in {
       restartTriggers = [cfg.package configFile];
 
       serviceConfig = {
+        ExecStartPre = "${pkgs.coreutils}/bin/install -Dm600 ${configFile} ${cfg.runDir}/config.yml";
         ExecStart = startScript;
         LoadCredential =
           lib.optional (cfg.secrets.tokenIdFile != null) "token-id:${cfg.secrets.tokenIdFile}"
